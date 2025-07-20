@@ -15,7 +15,7 @@
                     <x-slot name="thead">
                         <th>No</th>
                         <th>Nama Bahan</th>
-                        <th>Harga Bahan</th>
+                        <th>Harga</th>
                         <th>Ketengan</th>
                         <th>Aksi</th>
                     </x-slot>
@@ -52,8 +52,9 @@
                 {
                     data: 'nama_bahan'
                 },
+
                 {
-                    data: 'price'
+                    data: 'variants'
                 },
 
                 {
@@ -76,6 +77,7 @@
             $(`${modal} [name=_method]`).val('post');
             // Hide the filename display
             resetForm(`${modal} form`);
+            $("#variant-container").empty(); // kosongkan varian
         }
 
         // fungsi edit data
@@ -89,6 +91,13 @@
 
                     resetForm(`${modal} form`); // Reset the form fields
                     loopForm(response.data); // Populate the form fields with the response data
+                    // Tampilkan variants jika ada
+                    if (response.data.variants && Array.isArray(response.data.variants)) {
+                        $('#variant-container').empty(); // reset
+                        response.data.variants.forEach(variant => {
+                            addVariantRow(variant);
+                        });
+                    }
                 })
                 .fail(errors => { // Handle any errors from the GET request
                     $('#spinner-border').hide(); // Hide the spinner
@@ -105,6 +114,33 @@
                         loopErrors(errors.responseJSON.errors); // Handle validation errors
                     }
                 });
+        }
+
+        function addVariantRow(variant = {}) {
+            $('#variant-container').append(`
+        <div class="variant-item row mb-2">
+            <div class="col-md-2">
+                <label>Size</label>
+                <input type="text" name="variants[size][]" value="${variant.size ?? ''}" class="form-control" required>
+            </div>
+            <div class="col-md-2">
+                <label>Harga</label>
+                <input type="number" name="variants[price][]" value="${variant.price ?? ''}" class="form-control" required>
+            </div>
+            <div class="col-md-3">
+                <label>Min Qty Diskon</label>
+                <input type="number" name="variants[min_quantity_discount][]" value="${variant.min_quantity_discount ?? ''}" class="form-control">
+            </div>
+            <div class="col-md-2">
+                <label>Diskon (%)</label>
+                <input type="number" name="variants[discount_percent][]" value="${variant.discount_percent ?? ''}" class="form-control">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <label>&nbsp;</label>
+                <button type="button" class="btn btn-sm btn-danger remove-variant" onclick="$(this).closest('.variant-item').remove()">×</button>
+            </div>
+        </div>
+    `);
         }
 
         // fungsi delete data

@@ -45,6 +45,9 @@ function resetForm(selector) {
         ".form-control, .custom-select, [type=radio], [type=checkbox], [type=file], .select2, .note-editor"
     ).removeClass("is-invalid");
     $(".invalid-feedback").remove();
+
+    // ✅ Reset variant
+    $("#variant-container").empty(); // kosongkan varian
 }
 
 function loopForm(originalForm) {

@@ -8,4 +8,9 @@ class Bahan extends Model
 {
     use HasFactory;
     protected $table = 'bahans';
+
+    public function variants()
+    {
+        return $this->hasMany(BahanVariant::class);
+    }
 }
